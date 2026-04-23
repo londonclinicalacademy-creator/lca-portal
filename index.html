@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA · Anchor Pass UK · Student Portal</title>
+<style>
+  :root {
+    --navy: #0F2754; --navy-dark: #0a1d3f;
+    --teal: #0A7B6E; --gold: #C8922A; --gold-light: #fdf6e7;
+    --red: #DC2626; --red-light: #fef2f2;
+    --green: #16A34A; --green-light: #DCFCE7;
+    --amber: #CA8A04; --amber-light: #fef9c3;
+    --bg: #f8fafc; --card: #ffffff;
+    --border: #e2e8f0; --text: #1a2332;
+    --text-muted: #64748B; --text-light: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
+  .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+
+  .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%); }
+  .login-box { background: white; border-radius: 16px; padding: 40px 36px; max-width: 440px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+  .login-box h1 { font-size: 22px; color: var(--navy); margin-bottom: 6px; letter-spacing: 1px; font-weight: 900; }
+  .login-box .tag { color: var(--teal); font-style: italic; font-size: 13px; margin-bottom: 26px; }
+  .login-box label { display: block; font-size: 12px; color: var(--text-muted); margin: 14px 0 6px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .login-box input { width: 100%; padding: 11px 14px; border: 2px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; transition: border 0.15s; }
+  .login-box input:focus { outline: none; border-color: var(--navy); }
+  .login-btn { width: 100%; padding: 13px; margin-top: 20px; background: var(--gold); color: var(--navy); border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 1px; }
+  .login-btn:hover { background: #a87519; }
+  .teacher-link { text-align: center; margin-top: 18px; font-size: 12px; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
+  .err { color: var(--red); font-size: 12px; margin-top: 8px; }
+  .login-logo { text-align: center; margin-bottom: 20px; }
+  .login-logo .mark { display: inline-block; padding: 10px 16px; background: var(--navy); color: white; border-radius: 8px; font-weight: 900; letter-spacing: 3px; font-size: 13px; }
+
+  header { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%); color: white; padding: 18px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  header h1 { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+  header .tagline { font-size: 12px; color: var(--gold); font-style: italic; margin-top: 2px; }
+  header .user { display: flex; align-items: center; gap: 10px; }
+  header .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--gold); color: var(--navy); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  header .user-info { text-align: right; }
+  header .user-name { font-size: 14px; font-weight: 600; }
+  header .user-tier { font-size: 11px; opacity: 0.8; }
+  .logout-btn { margin-left: 8px; padding: 4px 10px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: inherit; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); overflow-x: auto; background: var(--card); border-radius: 8px 8px 0 0; padding: 4px 4px 0 4px; }
+  .tab { padding: 12px 18px; background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text-muted); border-bottom: 3px solid transparent; font-weight: 500; white-space: nowrap; font-family: inherit; }
+  .tab:hover { color: var(--navy); }
+  .tab.active { color: var(--navy); border-bottom-color: var(--gold); font-weight: 700; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .card h2 { font-size: 18px; margin-bottom: 12px; color: var(--navy); }
+  .card h3 { font-size: 15px; margin-bottom: 10px; color: var(--navy); font-weight: 600; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .stat .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .stat .value { font-size: 26px; font-weight: 800; color: var(--navy); }
+
+  .readiness-row { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .bar { flex: 1; height: 14px; background: var(--bg); border-radius: 7px; overflow: hidden; border: 1px solid var(--border); }
+  .bar-fill { height: 100%; border-radius: 7px; transition: width 0.3s; }
+  .readiness-pct { min-width: 60px; text-align: right; font-size: 18px; font-weight: 800; color: var(--navy); }
+  .readiness-label { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .status-ready { background: var(--green-light); color: #173404; }
+  .status-borderline { background: var(--amber-light); color: #412402; }
+  .status-risk { background: var(--red-light); color: #501313; }
+  .status-untested { background: #e2e8f0; color: #475569; }
+
+  .chapter-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .chapter-row:last-child { border-bottom: none; }
+  .chapter-row .name { min-width: 140px; font-weight: 500; color: var(--navy); }
+  .chapter-row .bar-mini { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .chapter-row .bar-mini-fill { height: 100%; border-radius: 4px; }
+  .chapter-row .pct { min-width: 44px; text-align: right; font-weight: 700; }
+
+  .trap-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .trap-row:last-child { border-bottom: none; }
+  .trap-word { background: var(--red-light); color: var(--red); padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; }
+
+  .q-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+  .q-text { font-size: 16px; font-weight: 600; line-height: 1.5; margin-bottom: 16px; color: var(--navy); }
+  .q-text .trap { background: var(--red-light); color: var(--red); padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+  .q-opts { display: flex; flex-direction: column; gap: 8px; }
+  .q-opt { text-align: left; padding: 12px 14px; background: var(--card); border: 2px solid var(--border); border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; color: var(--text); line-height: 1.4; }
+  .q-opt:hover:not(:disabled) { background: var(--gold-light); border-color: var(--gold); }
+  .q-opt:disabled { cursor: not-allowed; }
+  .q-opt.selected { background: #E6F1FB; border-color: var(--navy); }
+  .q-opt.correct { background: var(--green-light) !important; border-color: var(--green) !important; color: #173404 !important; font-weight: 600; }
+  .q-opt.wrong { background: var(--red-light) !important; border-color: var(--red) !important; color: #501313 !important; }
+
+  .feedback { margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 13px; line-height: 1.5; display: none; }
+  .feedback.show { display: block; }
+  .feedback.good { background: var(--green-light); border-left: 4px solid var(--green); color: #173404; }
+  .feedback.bad { background: var(--red-light); border-left: 4px solid var(--red); color: #501313; }
+  .feedback .title { font-weight: 700; margin-bottom: 4px; }
+
+  .btn { padding: 10px 20px; font-size: 14px; background: var(--navy); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: inherit; }
+  .btn:hover { background: var(--navy-dark); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn.gold { background: var(--gold); color: var(--navy); }
+  .btn.gold:hover { background: #a87519; }
+  .btn.outline { background: transparent; color: var(--navy); border: 2px solid var(--navy); }
+  .btn.red { background: transparent; color: var(--red); border: 2px solid var(--red); }
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+  .timer { display: inline-block; padding: 6px 12px; background: var(--navy); color: white; border-radius: 20px; font-size: 13px; font-weight: 700; font-family: monospace; }
+  .timer.warning { background: var(--amber); }
+  .timer.danger { background: var(--red); }
+
+  .progress-dots { display: flex; flex-wrap: wrap; gap: 5px; margin: 14px 0; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--border); }
+  .dot.correct { background: var(--green); }
+  .dot.wrong { background: var(--red); }
+  .dot.current { background: var(--gold); box-shadow: 0 0 0 2px rgba(200, 146, 42, 0.3); }
+  .dot.answered { background: var(--navy); }
+
+  .warn-box { background: var(--amber-light); border-left: 4px solid var(--amber); padding: 12px 16px; border-radius: 8px; font-size: 13px; margin: 14px 0; }
+  .warn-box .title { font-weight: 700; color: #713F12; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; margin-bottom: 4px; }
+
+  .result-big { text-align: center; padding: 24px; background: linear-gradient(135deg, var(--navy), var(--navy-dark)); color: white; border-radius: 12px; margin-bottom: 16px; }
+  .result-big .score { font-size: 52px; font-weight: 900; color: var(--gold); line-height: 1; margin: 10px 0; }
+  .result-big .label { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.9; }
+  .result-big .msg { margin-top: 12px; font-size: 14px; font-style: italic; }
+
+  .tier-result { padding: 24px; text-align: center; border-radius: 12px; margin-bottom: 16px; }
+  .tier-result.A { background: linear-gradient(135deg, var(--teal), #065F46); color: white; }
+  .tier-result.B { background: linear-gradient(135deg, var(--navy), var(--navy-dark)); color: white; }
+  .tier-result.C { background: linear-gradient(135deg, #7B1F10, #4A1B0C); color: white; }
+  .tier-result .tier-letter { font-size: 72px; font-weight: 900; line-height: 1; color: var(--gold); margin: 8px 0; }
+  .tier-result .tier-name { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .tier-result .tier-desc { font-size: 13px; opacity: 0.9; max-width: 420px; margin: 8px auto; line-height: 1.5; }
+
+  .student-select { padding: 10px 14px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); font-family: inherit; margin-bottom: 16px; width: 100%; max-width: 300px; }
+
+  .history-row { display: grid; grid-template-columns: 1.4fr 0.6fr 0.8fr 0.8fr 0.8fr; padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--border); align-items: center; gap: 8px; }
+  .history-row.head { background: var(--bg); font-weight: 700; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-radius: 6px 6px 0 0; }
+
+  footer { text-align: center; font-size: 11px; color: var(--text-light); margin-top: 30px; padding: 20px 0; }
+  footer a { color: var(--teal); text-decoration: none; }
+
+  @media (max-width: 640px) {
+    .history-row { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .history-row > div:nth-child(3), .history-row > div:nth-child(4) { display: none; }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><div class="mark">LCA</div></div>
+    <h1>ANCHOR PASS UK</h1>
+    <div class="tag">Student portal · Log in or sign up</div>
+
+    <div id="studentLogin">
+      <label>Your name</label>
+      <input type="text" id="loginName" placeholder="Enter your full name" autocomplete="off">
+      <label>Your access code (from Subathira)</label>
+      <input type="text" id="loginCode" placeholder="e.g. ANCHOR2026" autocomplete="off" style="text-transform: uppercase;">
+      <div class="err" id="loginErr"></div>
+      <button class="login-btn" id="loginBtn">Log in / Sign up</button>
+      <div class="teacher-link" id="showTeacherLogin">Teacher login →</div>
+    </div>
+
+    <div id="teacherLogin" style="display: none;">
+      <label>Teacher password</label>
+      <input type="password" id="teacherPw" placeholder="Enter teacher password" autocomplete="off">
+      <div class="err" id="teacherErr"></div>
+      <button class="login-btn" id="teacherLoginBtn">Log in as teacher</button>
+      <div class="teacher-link" id="showStudentLogin">← Student login</div>
+    </div>
+  </div>
+</div>
+
+<div id="app" style="display: none;">
+<div class="container">
+  <header>
+    <div>
+      <h1>ANCHOR PASS UK</h1>
+      <div class="tagline">London Clinical Academy · Life in the UK Test</div>
+    </div>
+    <div class="user">
+      <div class="avatar" id="avatarEl">–</div>
+      <div class="user-info">
+        <div class="user-name" id="nameEl">–</div>
+        <div class="user-tier" id="tierEl">–</div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="tabs" id="studentTabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="levelcheck">Level check</button>
+    <button class="tab" data-tab="drill">Practice drill</button>
+    <button class="tab" data-tab="mock">Mock test</button>
+    <button class="tab" data-tab="trap">Trap words</button>
+  </div>
+
+  <div class="tabs" id="teacherTabs" style="display: none;">
+    <button class="tab active" data-tab="teacher">All students</button>
+    <button class="tab" data-tab="stats">Statistics</button>
+    <button class="tab" data-tab="bank">Question bank</button>
+  </div>
+
+  <div class="panel active" id="panel-dashboard">
+    <div id="noLevelYet" class="card" style="display: none; background: var(--gold-light); border-color: var(--gold);">
+      <h3 style="color: var(--gold);">Take the level check first</h3>
+      <p style="font-size: 14px; margin-bottom: 10px;">Before you start practicing, take a 10-question level check. It takes 5 minutes and tells you which tier to be in.</p>
+      <button class="btn gold" id="goToLevelCheck">Start level check →</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="label">Questions done</div><div class="value" id="statQs">0</div></div>
+      <div class="stat"><div class="label">Accuracy</div><div class="value" id="statAcc">–</div></div>
+      <div class="stat"><div class="label">Mock tests</div><div class="value" id="statMocks">0</div></div>
+      <div class="stat"><div class="label">Best mock</div><div class="value" id="statBest">–</div></div>
+    </div>
+    <div class="card">
+      <h3>Readiness score</h3>
+      <div class="readiness-row">
+        <div class="bar"><div class="bar-fill" id="readBar" style="width: 0%; background: var(--amber);"></div></div>
+        <div class="readiness-pct" id="readPct">0%</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+        <span id="readStatus" class="readiness-label status-untested">Not yet assessed</span>
+        <span style="font-size: 12px; color: var(--text-muted);">Target: 80% to book the real exam</span>
+      </div>
+    </div>
+    <div class="card"><h3>Performance by chapter</h3><div id="chapterList"></div></div>
+    <div class="card"><h3>Trap-word accuracy</h3><div id="trapList"></div></div>
+  </div>
+
+  <div class="panel" id="panel-levelcheck">
+    <div id="level-start" class="card">
+      <h2>Level check — find your tier</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">10 questions. 45 seconds each. Tests content knowledge AND trap-word recognition. You get placed in Tier A, B, or C.</p>
+      <div class="warn-box">
+        <div class="title">Be honest</div>
+        Do it without help. If you get placed in the wrong tier, you waste your own time.
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0;">
+        <div style="padding: 12px; background: var(--teal); color: white; border-radius: 8px; font-size: 12px;">
+          <div style="font-size: 20px; font-weight: 900; color: var(--gold);">A</div>
+          <div style="font-weight: 700; margin: 4px 0;">Good English</div>
+          <div style="opacity: 0.9;">8+/10 no trap-word mistakes</div>
+        </div>
+        <div style="padding: 12px; background: var(--navy); color: white; border-radius: 8px; font-size: 12px;">
+          <div style="font-size: 20px; font-weight: 900; color: var(--gold);">B</div>
+          <div style="font-weight: 700; margin: 4px 0;">Limited English</div>
+          <div style="opacity: 0.9;">5-7/10 or miss 1-2 traps</div>
+        </div>
+        <div style="padding: 12px; background: #7B1F10; color: white; border-radius: 8px; font-size: 12px;">
+          <div style="font-size: 20px; font-weight: 900; color: var(--gold);">C</div>
+          <div style="font-weight: 700; margin: 4px 0;">Very limited</div>
+          <div style="opacity: 0.9;">Below 5/10 or miss 3+ traps</div>
+        </div>
+      </div>
+      <button class="btn gold" id="levelStartBtn">Start the level check</button>
+      <div id="previousLevel" style="margin-top: 14px;"></div>
+    </div>
+
+    <div id="level-q" class="card" style="display: none;">
+      <div class="q-header">
+        <span>Level check · <span id="lQn">1</span> of 10</span>
+        <span class="timer" id="lTimer">0:45</span>
+      </div>
+      <div class="progress-dots" id="lDots"></div>
+      <div class="q-text" id="lText"></div>
+      <div class="q-opts" id="lOpts"></div>
+      <div style="margin-top: 12px;" id="lMultiHint"></div>
+      <div class="btn-row">
+        <button class="btn" id="lNext">Next question</button>
+        <button class="btn gold" id="lCheck" style="display: none;">Submit this answer</button>
+      </div>
+    </div>
+
+    <div id="level-result" class="card" style="display: none;">
+      <div class="tier-result" id="tierResultBox">
+        <div class="label" style="font-size: 11px; letter-spacing: 2px; opacity: 0.8;">YOUR TIER</div>
+        <div class="tier-letter" id="tierLetter">–</div>
+        <div class="tier-name" id="tierName">–</div>
+        <div class="tier-desc" id="tierDesc">–</div>
+      </div>
+      <div class="card">
+        <h3>Your results</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div class="stat"><div class="label">Score</div><div class="value" id="lScore">–</div></div>
+          <div class="stat"><div class="label">Trap words missed</div><div class="value" id="lTrapMissed">–</div></div>
+        </div>
+        <div id="lBreakdown" style="font-size: 13px; color: var(--text-muted); line-height: 1.7;"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn gold" id="lRestart">Retake level check</button>
+        <button class="btn outline" id="lToDrill">Start practicing →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-drill">
+    <div id="drill-start" class="card">
+      <h2>Practice drill</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">10 random questions, untimed. Immediate feedback.</p>
+      <div class="warn-box">
+        <div class="title">The 3-step method</div>
+        1. Scan for trap words (NOT, EXCEPT, SELECT TWO). 2. Read slowly, word by word. 3. Check all 4 options before picking.
+      </div>
+      <div style="margin: 14px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Filter:</label>
+        <select id="drillFilter" class="student-select">
+          <option value="all">All chapters, random</option>
+          <option value="1">Chapter 1 — Values &amp; principles</option>
+          <option value="2">Chapter 2 — What is the UK</option>
+          <option value="3">Chapter 3 — History</option>
+          <option value="4">Chapter 4 — Modern society</option>
+          <option value="5">Chapter 5 — Government &amp; law</option>
+          <option value="trap">Trap-word questions only</option>
+          <option value="weak">My weakest chapters</option>
+        </select>
+      </div>
+      <button class="btn gold" id="drillStartBtn">Start 10-question drill</button>
+    </div>
+
+    <div id="drill-q" class="card" style="display: none;">
+      <div class="q-header">
+        <span>Question <span id="dQn">1</span> of 10</span>
+        <span id="dChap">Chapter –</span>
+      </div>
+      <div class="progress-dots" id="dDots"></div>
+      <div class="q-text" id="dText"></div>
+      <div class="q-opts" id="dOpts"></div>
+      <div style="margin-top: 12px;" id="dMultiHint"></div>
+      <div class="feedback" id="dFb"></div>
+      <div class="btn-row">
+        <button class="btn" id="dNext" style="display: none;">Next question</button>
+        <button class="btn gold" id="dCheck" style="display: none;">Check answers</button>
+      </div>
+    </div>
+
+    <div id="drill-result" class="card" style="display: none;">
+      <div class="result-big">
+        <div class="label">DRILL COMPLETE</div>
+        <div class="score" id="drillFinalScore">0/10</div>
+        <div class="msg" id="drillFinalMsg"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn gold" id="drillRestart">Another drill</button>
+        <button class="btn outline" id="drillToDash">Back to dashboard</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-mock">
+    <div id="mock-start" class="card">
+      <h2>Full mock test</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">24 questions · 45 minutes · 18/24 to pass.</p>
+      <div class="warn-box">
+        <div class="title">Rules</div>
+        · Timer cannot be paused.<br>
+        · No help, no notes, no phone.<br>
+        · Read every question twice.<br>
+        · Navigate between questions before submitting.
+      </div>
+      <div class="card" style="background: var(--bg); border: none; padding: 12px; margin-top: 14px;">
+        <h3 style="margin-bottom: 8px;">Previous attempts</h3>
+        <div id="mockHistory"></div>
+      </div>
+      <button class="btn gold" id="mockStartBtn" style="margin-top: 14px;">Start mock test</button>
+    </div>
+
+    <div id="mock-q" class="card" style="display: none;">
+      <div class="q-header">
+        <span>Question <span id="mQn">1</span> of 24</span>
+        <span class="timer" id="mTimer">45:00</span>
+      </div>
+      <div class="progress-dots" id="mDots"></div>
+      <div class="q-text" id="mText"></div>
+      <div class="q-opts" id="mOpts"></div>
+      <div style="margin-top: 12px;" id="mMultiHint"></div>
+      <div class="btn-row">
+        <button class="btn outline" id="mPrev">Previous</button>
+        <button class="btn" id="mNext">Next</button>
+        <button class="btn gold" id="mSubmit" style="display: none;">Submit test</button>
+      </div>
+    </div>
+
+    <div id="mock-result" class="card" style="display: none;">
+      <div class="result-big">
+        <div class="label">MOCK TEST RESULT</div>
+        <div class="score" id="mockFinalScore">0/24</div>
+        <div class="msg" id="mockFinalMsg"></div>
+      </div>
+      <div class="card">
+        <h3>Your weak areas</h3>
+        <div id="mockWeakAreas"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn gold" id="mockRestart">Take another mock</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-trap">
+    <div class="card">
+      <h2>The 15 trap words</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">These English words fail more candidates than any knowledge gap. Spot them, slow down.</p>
+      <div id="trapCards"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-teacher">
+    <div class="card">
+      <h2>All students</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Monitor all enrolled students.</p>
+      <div class="history-row head">
+        <div>Student</div>
+        <div>Tier</div>
+        <div>Questions</div>
+        <div>Best mock</div>
+        <div>Status</div>
+      </div>
+      <div id="teacherTable"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-stats">
+    <div class="card">
+      <h2>Statistics</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="label">Active students</div><div class="value" id="sActiveStudents">0</div></div>
+        <div class="stat"><div class="label">Questions answered</div><div class="value" id="sTotalAnswers">0</div></div>
+        <div class="stat"><div class="label">Mocks completed</div><div class="value" id="sTotalMocks">0</div></div>
+        <div class="stat"><div class="label">Pass-ready</div><div class="value" id="sReadyStudents">0</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>How readiness is calculated</h3>
+      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+        <strong>Readiness = (0.4 × best mock %) + (0.3 × accuracy) + (0.2 × trap accuracy) + (0.1 × questions attempted, capped)</strong><br><br>
+        <strong>Status:</strong> Pass-ready ≥ 80% · Borderline 65–79% · At risk below 65%.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Admin</h3>
+      <div class="btn-row">
+        <button class="btn outline" id="exportBtn">Export all data (JSON)</button>
+        <button class="btn red" id="resetAllBtn">Reset all students</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-bank">
+    <div class="card">
+      <h2>Question bank</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">700 original questions across 5 chapters.</p>
+      <div style="margin: 10px 0;">
+        <select id="bankFilter" class="student-select">
+          <option value="all">All 700 questions</option>
+          <option value="1">Chapter 1 only</option>
+          <option value="2">Chapter 2 only</option>
+          <option value="3">Chapter 3 only</option>
+          <option value="4">Chapter 4 only</option>
+          <option value="5">Chapter 5 only</option>
+          <option value="trap">Trap-word questions only</option>
+        </select>
+      </div>
+      <div id="bankStats" style="margin: 10px 0; font-size: 13px; color: var(--text-muted);"></div>
+      <div id="bankList"></div>
+    </div>
+  </div>
+
+  <footer>
+    © London Clinical Academy · Anchor Pass UK · Portal v2 · 700 questions<br>
+    <a href="https://www.londonclinicalacademy.co.uk" target="_blank">www.londonclinicalacademy.co.uk</a> · WhatsApp 07884 974876
+  </footer>
+</div>
+</div>
+
+<script src="questions_all.js"></script>
+<script>
+const VALID_ACCESS_CODES = ['ANCHOR2026', 'LCAYESAMMA', 'DEMO'];
+const TEACHER_PASSWORD = 'LCATEACHER2026';
+const ALL_STUDENTS_KEY = 'lca_all_students';
+
+let currentStudent = null;
+let state = null;
+
+function loadAllStudents() {
+  try {
+    const raw = localStorage.getItem(ALL_STUDENTS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    'Yesamma': seedStudent('Yesamma', 'C'),
+    'Anita Kumar': seedStudent('Anita Kumar', 'B', { demoAcc: 84, demoQ: 412 }),
+    'Ravi Patel': seedStudent('Ravi Patel', 'A', { demoAcc: 79, demoQ: 156 }),
+    'Priya Singh': seedStudent('Priya Singh', 'C', { demoAcc: 45, demoQ: 89 })
+  };
+}
+
+function seedStudent(name, tier, opts) {
+  opts = opts || {};
+  const s = { name: name, tier: tier || null, attempts: [], mocks: [], levelCheck: null, createdAt: Date.now() };
+  if (opts.demoAcc) {
+    const n = opts.demoQ || 100;
+    for (let i = 0; i < n; i++) {
+      s.attempts.push({ qId: (i % 100) + 1, chapter: ((i % 5) + 1), trap: i % 7 === 0 ? 'NOT' : null, correct: Math.random() * 100 < opts.demoAcc, ts: Date.now() - i * 1000 });
+    }
+    const mockCount = 2 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < mockCount; i++) s.mocks.push({ score: Math.round(opts.demoAcc / 100 * 24), ts: Date.now() - i * 86400000 });
+  }
+  return s;
+}
+
+function saveAllStudents() { localStorage.setItem(ALL_STUDENTS_KEY, JSON.stringify(allStudents)); }
+let allStudents = loadAllStudents();
+
+document.getElementById('loginBtn').addEventListener('click', function() {
+  const name = document.getElementById('loginName').value.trim();
+  const code = document.getElementById('loginCode').value.trim().toUpperCase();
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  if (!name) { err.textContent = 'Please enter your name.'; return; }
+  if (!code) { err.textContent = 'Please enter your access code.'; return; }
+  if (VALID_ACCESS_CODES.indexOf(code) === -1) {
+    err.textContent = 'Invalid access code. Contact Subathira on WhatsApp 07884 974876.';
+    return;
+  }
+  if (!allStudents[name]) { allStudents[name] = seedStudent(name, null); saveAllStudents(); }
+  currentStudent = name;
+  state = allStudents[name];
+  showApp();
+});
+
+document.getElementById('teacherLoginBtn').addEventListener('click', function() {
+  const pw = document.getElementById('teacherPw').value;
+  const err = document.getElementById('teacherErr');
+  err.textContent = '';
+  if (pw !== TEACHER_PASSWORD) { err.textContent = 'Wrong password.'; return; }
+  currentStudent = '__teacher__';
+  showApp();
+});
+
+document.getElementById('showTeacherLogin').addEventListener('click', function() {
+  document.getElementById('studentLogin').style.display = 'none';
+  document.getElementById('teacherLogin').style.display = 'block';
+});
+document.getElementById('showStudentLogin').addEventListener('click', function() {
+  document.getElementById('teacherLogin').style.display = 'none';
+  document.getElementById('studentLogin').style.display = 'block';
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  currentStudent = null; state = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginCode').value = '';
+  document.getElementById('teacherPw').value = '';
+});
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  if (currentStudent === '__teacher__') {
+    document.getElementById('nameEl').textContent = 'Teacher · Subathira';
+    document.getElementById('tierEl').textContent = 'Admin view';
+    document.getElementById('avatarEl').textContent = 'SB';
+    document.getElementById('studentTabs').style.display = 'none';
+    document.getElementById('teacherTabs').style.display = 'flex';
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+    document.getElementById('panel-teacher').classList.add('active');
+    renderTeacher();
+  } else {
+    document.getElementById('nameEl').textContent = state.name;
+    document.getElementById('tierEl').textContent = state.tier ? 'Tier ' + state.tier : 'Not yet assessed';
+    const parts = state.name.split(' ');
+    const initials = parts.map(function(p){return p[0];}).join('').slice(0, 2).toUpperCase();
+    document.getElementById('avatarEl').textContent = initials || 'ST';
+    document.getElementById('studentTabs').style.display = 'flex';
+    document.getElementById('teacherTabs').style.display = 'none';
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+    document.getElementById('panel-dashboard').classList.add('active');
+    document.querySelectorAll('#studentTabs .tab').forEach(function(t){t.classList.remove('active');});
+    document.querySelector('#studentTabs [data-tab=dashboard]').classList.add('active');
+    renderDashboard();
+  }
+}
+
+document.querySelectorAll('.tab').forEach(function(t) {
+  t.addEventListener('click', function() {
+    const parent = t.parentElement;
+    parent.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+    if (t.dataset.tab === 'dashboard') renderDashboard();
+    if (t.dataset.tab === 'teacher') renderTeacher();
+    if (t.dataset.tab === 'trap') renderTrapWords();
+    if (t.dataset.tab === 'mock') renderMockHistory();
+    if (t.dataset.tab === 'stats') renderStats();
+    if (t.dataset.tab === 'bank') renderBank();
+    if (t.dataset.tab === 'levelcheck') renderLevelStart();
+  });
+});
+
+document.getElementById('goToLevelCheck').addEventListener('click', function(){
+  document.querySelector('#studentTabs [data-tab=levelcheck]').click();
+});
+document.getElementById('lToDrill').addEventListener('click', function(){
+  document.querySelector('#studentTabs [data-tab=drill]').click();
+});
+document.getElementById('drillToDash').addEventListener('click', function(){
+  document.querySelector('#studentTabs [data-tab=dashboard]').click();
+});
+
+function computeStats(stu) {
+  const attempts = stu.attempts;
+  const total = attempts.length;
+  const correct = attempts.filter(function(a){return a.correct;}).length;
+  const acc = total ? Math.round((correct / total) * 100) : 0;
+  const chapterAcc = {};
+  for (let c = 1; c <= 5; c++) {
+    const ca = attempts.filter(function(a){return a.chapter === c;});
+    chapterAcc[c] = ca.length ? Math.round(ca.filter(function(a){return a.correct;}).length / ca.length * 100) : null;
+  }
+  const trapAttempts = attempts.filter(function(a){return a.trap;});
+  const trapAcc = {};
+  const trapList = ['NOT', 'EXCEPT', 'SELECT TWO', 'WHICH TWO', 'BOTH', 'FALSE', 'NEVER', 'NONE', 'MOST', 'ONLY', 'MAINLY', 'ALWAYS', 'SOMETIMES', 'USUALLY'];
+  trapList.forEach(function(t) {
+    const ta = trapAttempts.filter(function(a){return a.trap === t;});
+    trapAcc[t] = { acc: ta.length ? Math.round(ta.filter(function(a){return a.correct;}).length / ta.length * 100) : null, seen: ta.length };
+  });
+  const overallTrapAcc = trapAttempts.length ? Math.round(trapAttempts.filter(function(a){return a.correct;}).length / trapAttempts.length * 100) : null;
+  const mocks = stu.mocks;
+  const bestMock = mocks.length ? Math.max.apply(Math, mocks.map(function(m){return m.score;})) : null;
+  const bestMockPct = bestMock !== null ? Math.round(bestMock / 24 * 100) : null;
+  let readiness = 0;
+  if (mocks.length) readiness += 0.4 * bestMockPct;
+  else readiness += 0.4 * Math.min(acc, 70);
+  readiness += 0.3 * acc;
+  readiness += 0.2 * (overallTrapAcc || 0);
+  readiness += 0.1 * Math.min(total / 150 * 100, 100);
+  readiness = Math.round(readiness);
+  let status;
+  if (!mocks.length && total < 20) status = { cls: 'status-untested', text: 'Not yet assessed' };
+  else if (readiness >= 80) status = { cls: 'status-ready', text: 'Pass-ready' };
+  else if (readiness >= 65) status = { cls: 'status-borderline', text: 'Borderline' };
+  else status = { cls: 'status-risk', text: 'At risk' };
+  return { total: total, correct: correct, acc: acc, chapterAcc: chapterAcc, trapAcc: trapAcc, overallTrapAcc: overallTrapAcc, bestMock: bestMock, bestMockPct: bestMockPct, mocks: mocks, readiness: readiness, status: status };
+}
+
+function renderDashboard() {
+  if (currentStudent === '__teacher__') return;
+  const s = computeStats(state);
+  document.getElementById('statQs').textContent = s.total;
+  document.getElementById('statAcc').textContent = s.total ? s.acc + '%' : '–';
+  document.getElementById('statMocks').textContent = s.mocks.length;
+  document.getElementById('statBest').textContent = s.bestMock !== null ? s.bestMock + '/24' : '–';
+  document.getElementById('noLevelYet').style.display = state.levelCheck ? 'none' : 'block';
+  document.getElementById('readPct').textContent = s.readiness + '%';
+  const bar = document.getElementById('readBar');
+  bar.style.width = s.readiness + '%';
+  const sBadge = document.getElementById('readStatus');
+  sBadge.className = 'readiness-label ' + s.status.cls;
+  sBadge.textContent = s.status.text;
+  if (s.status.cls === 'status-ready') bar.style.background = 'var(--green)';
+  else if (s.status.cls === 'status-borderline') bar.style.background = 'var(--amber)';
+  else if (s.status.cls === 'status-risk') bar.style.background = 'var(--red)';
+  else bar.style.background = '#94a3b8';
+  const chapterNames = { 1: 'Ch 1 · Values', 2: 'Ch 2 · UK today', 3: 'Ch 3 · History', 4: 'Ch 4 · Modern society', 5: 'Ch 5 · Government' };
+  document.getElementById('chapterList').innerHTML = Object.entries(chapterNames).map(function(pair) {
+    const k = pair[0], n = pair[1];
+    const pct = s.chapterAcc[k];
+    const color = pct === null ? '#e2e8f0' : pct >= 75 ? 'var(--green)' : pct >= 60 ? 'var(--amber)' : 'var(--red)';
+    const disp = pct === null ? '—' : pct + '%';
+    return '<div class="chapter-row"><div class="name">' + n + '</div><div class="bar-mini"><div class="bar-mini-fill" style="width: ' + (pct || 0) + '%; background: ' + color + ';"></div></div><div class="pct">' + disp + '</div></div>';
+  }).join('');
+  const seen = Object.entries(s.trapAcc).filter(function(pair){return pair[1].seen > 0;}).sort(function(a,b){return a[1].acc - b[1].acc;});
+  if (seen.length === 0) {
+    document.getElementById('trapList').innerHTML = '<p style="font-size: 13px; color: var(--text-muted); padding: 10px 0;">No trap-word questions attempted yet.</p>';
+  } else {
+    document.getElementById('trapList').innerHTML = seen.map(function(pair) {
+      const w = pair[0], t = pair[1];
+      const color = t.acc >= 70 ? 'var(--green)' : t.acc >= 50 ? 'var(--amber)' : 'var(--red)';
+      return '<div class="trap-row"><div><span class="trap-word">' + w + '</span> <span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">' + t.seen + ' seen</span></div><div style="font-weight: 700; color: ' + color + ';">' + t.acc + '%</div></div>';
+    }).join('');
+  }
+}
+
+let levelState = null;
+let levelTimerInt = null;
+
+function pickLevelQuestions() {
+  const nonTrap = QUESTIONS.filter(function(q){return !q.trap;});
+  const trap = QUESTIONS.filter(function(q){return q.trap;});
+  const picked = [];
+  const byChap = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+  nonTrap.forEach(function(q){byChap[q.chapter].push(q);});
+  Object.keys(byChap).forEach(function(c){byChap[c].sort(function(){return Math.random() - 0.5;});});
+  const distribution = [1, 1, 2, 1, 1];
+  for (let c = 1; c <= 5; c++) {
+    for (let i = 0; i < distribution[c-1]; i++) {
+      if (byChap[c][i]) picked.push(byChap[c][i]);
+    }
+  }
+  const trapShuffled = trap.slice().sort(function(){return Math.random() - 0.5;});
+  const trapTypes = ['NOT', 'EXCEPT', 'SELECT TWO', 'MOST'];
+  trapTypes.forEach(function(tt) {
+    const q = trapShuffled.find(function(q){return q.trap === tt && picked.indexOf(q) === -1;});
+    if (q) picked.push(q);
+  });
+  while (picked.length < 10) {
+    const extra = trapShuffled.find(function(q){return picked.indexOf(q) === -1;}) || nonTrap[Math.floor(Math.random() * nonTrap.length)];
+    picked.push(extra);
+  }
+  return picked.slice(0, 10).sort(function(){return Math.random() - 0.5;});
+}
+
+function renderLevelStart() {
+  const prev = state && state.levelCheck;
+  const prevEl = document.getElementById('previousLevel');
+  if (prev) {
+    const d = new Date(prev.ts);
+    prevEl.innerHTML = '<div class="warn-box"><div class="title">Previous result</div>You took this level check on ' + d.toLocaleDateString('en-GB') + '. You scored ' + prev.score + '/10 and were placed in <strong>Tier ' + prev.tier + '</strong>. Retaking will overwrite that result.</div>';
+  } else {
+    prevEl.innerHTML = '';
+  }
+}
+
+document.getElementById('levelStartBtn').addEventListener('click', function() {
+  const questions = pickLevelQuestions();
+  levelState = { qs: questions, idx: 0, responses: new Array(10).fill(null), timeLeft: 45, startTime: Date.now() };
+  document.getElementById('level-start').style.display = 'none';
+  document.getElementById('level-result').style.display = 'none';
+  document.getElementById('level-q').style.display = 'block';
+  renderLevelQ();
+  startLevelTimer();
+});
+
+function startLevelTimer() {
+  clearInterval(levelTimerInt);
+  levelState.timeLeft = 45;
+  levelTimerInt = setInterval(function() {
+    levelState.timeLeft--;
+    updateLevelTimer();
+    if (levelState.timeLeft <= 0) nextLevelQ();
+  }, 1000);
+}
+
+function updateLevelTimer() {
+  const tEl = document.getElementById('lTimer');
+  const t = levelState.timeLeft;
+  tEl.textContent = '0:' + t.toString().padStart(2, '0');
+  tEl.className = 'timer';
+  if (t <= 10) tEl.className = 'timer danger';
+  else if (t <= 20) tEl.className = 'timer warning';
+}
+
+function renderLevelQ() {
+  const q = levelState.qs[levelState.idx];
+  document.getElementById('lQn').textContent = levelState.idx + 1;
+  document.getElementById('lText').innerHTML = highlightTraps(q.q);
+  const isMulti = Array.isArray(q.answer);
+  document.getElementById('lOpts').innerHTML = q.opts.map(function(o, i) {
+    return '<button class="q-opt" data-idx="' + i + '">' + String.fromCharCode(65 + i) + '. ' + o + '</button>';
+  }).join('');
+  document.querySelectorAll('#lOpts .q-opt').forEach(function(b) {
+    b.addEventListener('click', function(e) { onLevelPick(parseInt(e.currentTarget.dataset.idx), isMulti); });
+  });
+  document.getElementById('lMultiHint').innerHTML = isMulti ? '<p style="font-size: 13px; color: var(--text-muted);">Select <strong>2</strong> answers, then tap Submit.</p>' : '';
+  document.getElementById('lNext').style.display = isMulti ? 'none' : 'inline-block';
+  document.getElementById('lCheck').style.display = isMulti ? 'inline-block' : 'none';
+  renderDots('lDots', levelState.qs.length, levelState.idx, levelState.responses.map(function(r){return r !== null ? 'answered' : null;}));
+}
+
+function onLevelPick(idx, isMulti) {
+  if (isMulti) {
+    const cur = levelState.responses[levelState.idx] || [];
+    const newVal = cur.indexOf(idx) !== -1 ? cur.filter(function(x){return x !== idx;}) : (cur.length < 2 ? cur.concat([idx]) : cur);
+    levelState.responses[levelState.idx] = newVal;
+    document.querySelectorAll('#lOpts .q-opt').forEach(function(b, i) {
+      b.classList.toggle('selected', (levelState.responses[levelState.idx] || []).indexOf(i) !== -1);
+    });
+  } else {
+    levelState.responses[levelState.idx] = idx;
+    nextLevelQ();
+  }
+}
+
+document.getElementById('lCheck').addEventListener('click', function() {
+  const r = levelState.responses[levelState.idx];
+  if (!Array.isArray(r) || r.length !== 2) { alert('Please select exactly 2 answers.'); return; }
+  nextLevelQ();
+});
+document.getElementById('lNext').addEventListener('click', nextLevelQ);
+
+function nextLevelQ() {
+  clearInterval(levelTimerInt);
+  levelState.idx++;
+  if (levelState.idx >= levelState.qs.length) { submitLevelCheck(); return; }
+  renderLevelQ();
+  startLevelTimer();
+}
+
+function submitLevelCheck() {
+  clearInterval(levelTimerInt);
+  let score = 0;
+  let trapMissed = 0;
+  const details = [];
+  levelState.qs.forEach(function(q, i) {
+    const r = levelState.responses[i];
+    let isCorrect = false;
+    if (r !== null) {
+      if (Array.isArray(q.answer)) isCorrect = Array.isArray(r) && r.length === q.answer.length && r.every(function(x){return q.answer.indexOf(x) !== -1;});
+      else isCorrect = r === q.answer;
+    }
+    if (isCorrect) score++;
+    else if (q.trap) trapMissed++;
+    details.push({ q: q.q, chapter: q.chapter, trap: q.trap, isCorrect: isCorrect });
+    state.attempts.push({ qId: q.id, chapter: q.chapter, trap: q.trap, correct: isCorrect, ts: Date.now(), levelCheck: true });
+  });
+
+  let tier;
+  if (score >= 8 && trapMissed === 0) tier = 'A';
+  else if (score >= 5 && trapMissed <= 2) tier = 'B';
+  else tier = 'C';
+
+  state.tier = tier;
+  state.levelCheck = { score: score, trapMissed: trapMissed, tier: tier, ts: Date.now(), details: details };
+  saveAllStudents();
+
+  document.getElementById('level-q').style.display = 'none';
+  document.getElementById('level-result').style.display = 'block';
+  document.getElementById('tierResultBox').className = 'tier-result ' + tier;
+  document.getElementById('tierLetter').textContent = tier;
+  const tierNames = { A: 'Good English · Tier A', B: 'Limited English · Tier B', C: 'Very limited English · Tier C' };
+  const tierDescs = {
+    A: 'You have strong English reading skills. My 12-hour Tier A programme focuses on filling content gaps and drilling exam technique. Contact Subathira: WhatsApp 07884 974876.',
+    B: 'Your English reading is limited. You need bilingual teaching (Tamil + English) and heavy trap-word training. My 12-hour Tier B programme is designed for you. Contact Subathira: WhatsApp 07884 974876.',
+    C: 'You need the most support. My 12-hour Tier C programme is taught 80% in Tamil, focuses only on the 40 most-tested facts, and includes daily WhatsApp drills. For students who have failed multiple times, this is the rescue programme. Contact Subathira: WhatsApp 07884 974876.'
+  };
+  document.getElementById('tierName').textContent = tierNames[tier];
+  document.getElementById('tierDesc').textContent = tierDescs[tier];
+  document.getElementById('lScore').textContent = score + '/10';
+  document.getElementById('lTrapMissed').textContent = trapMissed;
+  const trapTotal = details.filter(function(d){return d.trap;}).length;
+  const trapRight = details.filter(function(d){return d.trap && d.isCorrect;}).length;
+  document.getElementById('lBreakdown').innerHTML = '<p><strong>Content knowledge:</strong> ' + score + '/10 (' + Math.round(score/10*100) + '%)</p><p><strong>Trap-word recognition:</strong> ' + trapRight + '/' + trapTotal + ' correct — you missed ' + trapMissed + ' trap-word question' + (trapMissed !== 1 ? 's' : '') + '</p>';
+  document.getElementById('tierEl').textContent = 'Tier ' + tier;
+}
+
+document.getElementById('lRestart').addEventListener('click', function() {
+  document.getElementById('level-result').style.display = 'none';
+  document.getElementById('level-start').style.display = 'block';
+  renderLevelStart();
+});
+
+function highlightTraps(text) {
+  return text.replace(/\b(NOT|EXCEPT|SELECT TWO|WHICH TWO|BOTH|FALSE|NEVER|NONE|MOST|ONLY|MAINLY|ALWAYS|SOMETIMES|USUALLY)\b/g, '<span class="trap">$1</span>');
+}
+
+let drillState = null;
+
+document.getElementById('drillStartBtn').addEventListener('click', function() {
+  const filter = document.getElementById('drillFilter').value;
+  let pool = QUESTIONS.slice();
+  if (filter === 'trap') pool = pool.filter(function(q){return q.trap;});
+  else if (filter === 'weak') {
+    const stats = computeStats(state);
+    const weak = Object.entries(stats.chapterAcc).filter(function(p){return p[1] !== null && p[1] < 70;}).map(function(p){return parseInt(p[0]);});
+    if (weak.length) pool = pool.filter(function(q){return weak.indexOf(q.chapter) !== -1;});
+  } else if (filter !== 'all') pool = pool.filter(function(q){return q.chapter === parseInt(filter);});
+  if (pool.length < 10) { alert('Not enough questions. Pick another.'); return; }
+  pool.sort(function(){return Math.random() - 0.5;});
+  drillState = { qs: pool.slice(0, 10), idx: 0, answers: [], correct: 0, selected: [] };
+  document.getElementById('drill-start').style.display = 'none';
+  document.getElementById('drill-result').style.display = 'none';
+  document.getElementById('drill-q').style.display = 'block';
+  renderDrillQ();
+});
+
+function renderDrillQ() {
+  const q = drillState.qs[drillState.idx];
+  drillState.selected = [];
+  document.getElementById('dQn').textContent = drillState.idx + 1;
+  document.getElementById('dChap').textContent = 'Chapter ' + q.chapter + (q.trap ? ' · trap: ' + q.trap : '');
+  document.getElementById('dText').innerHTML = highlightTraps(q.q);
+  const isMulti = Array.isArray(q.answer);
+  document.getElementById('dOpts').innerHTML = q.opts.map(function(o, i) {
+    return '<button class="q-opt" data-idx="' + i + '">' + String.fromCharCode(65 + i) + '. ' + o + '</button>';
+  }).join('');
+  document.querySelectorAll('#dOpts .q-opt').forEach(function(b) {
+    b.addEventListener('click', function(e) { onDrillPick(parseInt(e.currentTarget.dataset.idx), q, isMulti); });
+  });
+  document.getElementById('dMultiHint').innerHTML = isMulti ? '<p style="font-size: 13px; color: var(--text-muted);">Select <strong>2</strong> answers, then tap <strong>Check</strong>.</p>' : '';
+  document.getElementById('dCheck').style.display = isMulti ? 'inline-block' : 'none';
+  document.getElementById('dNext').style.display = 'none';
+  document.getElementById('dFb').classList.remove('show');
+  renderDots('dDots', drillState.qs.length, drillState.idx, drillState.answers.map(function(a){return a ? 'correct' : 'wrong';}));
+}
+
+function onDrillPick(idx, q, isMulti) {
+  if (isMulti) {
+    const btn = document.querySelectorAll('#dOpts .q-opt')[idx];
+    if (drillState.selected.indexOf(idx) !== -1) {
+      drillState.selected = drillState.selected.filter(function(x){return x !== idx;});
+      btn.classList.remove('selected');
+    } else if (drillState.selected.length < 2) {
+      drillState.selected.push(idx);
+      btn.classList.add('selected');
+    }
+  } else {
+    const correct = idx === q.answer;
+    revealDrill(q, [idx], correct);
+  }
+}
+
+document.getElementById('dCheck').addEventListener('click', function() {
+  const q = drillState.qs[drillState.idx];
+  if (drillState.selected.length !== 2) { alert('Select 2 answers first.'); return; }
+  const correct = drillState.selected.length === 2 && drillState.selected.every(function(s){return q.answer.indexOf(s) !== -1;});
+  revealDrill(q, drillState.selected, correct);
+});
+
+function revealDrill(q, picked, correct) {
+  const isMulti = Array.isArray(q.answer);
+  document.querySelectorAll('#dOpts .q-opt').forEach(function(b, i) {
+    b.disabled = true;
+    b.classList.remove('selected');
+    const isRight = isMulti ? q.answer.indexOf(i) !== -1 : i === q.answer;
+    const wasPicked = picked.indexOf(i) !== -1;
+    if (isRight) b.classList.add('correct');
+    else if (wasPicked) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('dFb');
+  fb.classList.add('show');
+  fb.className = 'feedback show ' + (correct ? 'good' : 'bad');
+  const rightText = isMulti ? q.answer.map(function(a){return q.opts[a];}).join(' AND ') : q.opts[q.answer];
+  fb.innerHTML = '<div class="title">' + (correct ? '✓ Correct' : '✗ Not quite') + '</div>' + (correct ? '' : '<div style="margin-bottom:6px;"><strong>Answer:</strong> ' + rightText + '</div>') + '<div>' + q.explain + '</div>' + (q.trap ? '<div style="margin-top:6px; font-size:12px;"><strong>Trap word:</strong> <span class="trap-word">' + q.trap + '</span></div>' : '');
+  document.getElementById('dCheck').style.display = 'none';
+  document.getElementById('dNext').style.display = 'inline-block';
+  if (correct) drillState.correct++;
+  drillState.answers.push(correct);
+  state.attempts.push({ qId: q.id, chapter: q.chapter, trap: q.trap, correct: correct, ts: Date.now() });
+  saveAllStudents();
+}
+
+document.getElementById('dNext').addEventListener('click', function() {
+  drillState.idx++;
+  if (drillState.idx >= drillState.qs.length) {
+    document.getElementById('drill-q').style.display = 'none';
+    document.getElementById('drill-result').style.display = 'block';
+    document.getElementById('drillFinalScore').textContent = drillState.correct + '/10';
+    const pct = drillState.correct / 10 * 100;
+    document.getElementById('drillFinalMsg').textContent = pct >= 80 ? 'Strong. Keep drilling trap words.' : pct >= 60 ? 'Borderline. Focus on trap-word questions.' : 'More practice needed.';
+  } else {
+    renderDrillQ();
+  }
+});
+
+document.getElementById('drillRestart').addEventListener('click', function() {
+  document.getElementById('drill-result').style.display = 'none';
+  document.getElementById('drill-start').style.display = 'block';
+});
+
+function renderDots(id, total, current, answers) {
+  const el = document.getElementById(id);
+  let html = '';
+  for (let i = 0; i < total; i++) {
+    let cls = 'dot';
+    if (answers && i < answers.length && answers[i] !== null && answers[i] !== undefined) {
+      if (answers[i] === 'correct' || answers[i] === true) cls += ' correct';
+      else if (answers[i] === 'wrong' || answers[i] === false) cls += ' wrong';
+      else cls += ' answered';
+    } else if (i === current) cls += ' current';
+    html += '<span class="' + cls + '"></span>';
+  }
+  el.innerHTML = html;
+}
+
+let mockState = null;
+let mockTimerInt = null;
+
+document.getElementById('mockStartBtn').addEventListener('click', function() {
+  if (!confirm('Start a full timed mock? 24 questions, 45 minutes, no pausing.')) return;
+  const pool = QUESTIONS.slice().sort(function(){return Math.random() - 0.5;}).slice(0, 24);
+  mockState = { qs: pool, idx: 0, responses: new Array(24).fill(null), timeLeft: 45 * 60, startTime: Date.now() };
+  document.getElementById('mock-start').style.display = 'none';
+  document.getElementById('mock-result').style.display = 'none';
+  document.getElementById('mock-q').style.display = 'block';
+  renderMockQ();
+  mockTimerInt = setInterval(updateMockTimer, 1000);
+});
+
+function updateMockTimer() {
+  mockState.timeLeft--;
+  if (mockState.timeLeft <= 0) { submitMock(); return; }
+  const m = Math.floor(mockState.timeLeft / 60);
+  const s = mockState.timeLeft % 60;
+  const tEl = document.getElementById('mTimer');
+  tEl.textContent = m + ':' + s.toString().padStart(2, '0');
+  tEl.className = 'timer';
+  if (mockState.timeLeft < 60) tEl.className = 'timer danger';
+  else if (mockState.timeLeft < 300) tEl.className = 'timer warning';
+}
+
+function renderMockQ() {
+  const q = mockState.qs[mockState.idx];
+  const resp = mockState.responses[mockState.idx];
+  document.getElementById('mQn').textContent = mockState.idx + 1;
+  document.getElementById('mText').innerHTML = highlightTraps(q.q);
+  const isMulti = Array.isArray(q.answer);
+  document.getElementById('mOpts').innerHTML = q.opts.map(function(o, i) {
+    const picked = resp !== null && (isMulti ? resp.indexOf(i) !== -1 : resp === i);
+    return '<button class="q-opt ' + (picked ? 'selected' : '') + '" data-idx="' + i + '">' + String.fromCharCode(65 + i) + '. ' + o + '</button>';
+  }).join('');
+  document.querySelectorAll('#mOpts .q-opt').forEach(function(b) {
+    b.addEventListener('click', function(e) { onMockPick(parseInt(e.currentTarget.dataset.idx), q, isMulti); });
+  });
+  document.getElementById('mMultiHint').innerHTML = isMulti ? '<p style="font-size: 13px; color: var(--text-muted);">This question asks for <strong>2</strong> answers.</p>' : '';
+  document.getElementById('mPrev').disabled = mockState.idx === 0;
+  const isLast = mockState.idx === mockState.qs.length - 1;
+  document.getElementById('mNext').style.display = isLast ? 'none' : 'inline-block';
+  document.getElementById('mSubmit').style.display = isLast ? 'inline-block' : 'none';
+  let html = '';
+  for (let i = 0; i < 24; i++) {
+    let cls = 'dot';
+    if (i === mockState.idx) cls += ' current';
+    else if (mockState.responses[i] !== null) cls += ' answered';
+    html += '<span class="' + cls + '" style="cursor:pointer" onclick="mockJumpTo(' + i + ')"></span>';
+  }
+  document.getElementById('mDots').innerHTML = html;
+}
+
+window.mockJumpTo = function(i) { mockState.idx = i; renderMockQ(); };
+
+function onMockPick(idx, q, isMulti) {
+  if (isMulti) {
+    const cur = mockState.responses[mockState.idx] || [];
+    const newVal = cur.indexOf(idx) !== -1 ? cur.filter(function(x){return x !== idx;}) : (cur.length < 2 ? cur.concat([idx]) : cur);
+    mockState.responses[mockState.idx] = newVal;
+  } else {
+    mockState.responses[mockState.idx] = idx;
+  }
+  renderMockQ();
+}
+
+document.getElementById('mPrev').addEventListener('click', function() { if (mockState.idx > 0) { mockState.idx--; renderMockQ(); } });
+document.getElementById('mNext').addEventListener('click', function() { if (mockState.idx < 23) { mockState.idx++; renderMockQ(); } });
+document.getElementById('mSubmit').addEventListener('click', function() { if (confirm('Submit your answers? This is final.')) submitMock(); });
+
+function submitMock() {
+  clearInterval(mockTimerInt);
+  let score = 0;
+  const weakChapters = {};
+  mockState.qs.forEach(function(q, i) {
+    const resp = mockState.responses[i];
+    let correct = false;
+    if (resp !== null) {
+      if (Array.isArray(q.answer)) correct = Array.isArray(resp) && resp.length === q.answer.length && resp.every(function(r){return q.answer.indexOf(r) !== -1;});
+      else correct = resp === q.answer;
+    }
+    if (correct) score++;
+    else weakChapters[q.chapter] = (weakChapters[q.chapter] || 0) + 1;
+    state.attempts.push({ qId: q.id, chapter: q.chapter, trap: q.trap, correct: correct, ts: Date.now(), mock: true });
+  });
+  state.mocks.push({ score: score, ts: Date.now(), duration: (Date.now() - mockState.startTime) / 1000 });
+  saveAllStudents();
+  document.getElementById('mock-q').style.display = 'none';
+  document.getElementById('mock-result').style.display = 'block';
+  document.getElementById('mockFinalScore').textContent = score + '/24';
+  let msg;
+  if (score >= 18) msg = 'PASS-READY. Book the real exam.';
+  else if (score >= 15) msg = 'Borderline. Drill weak areas before booking.';
+  else msg = 'Not yet. Postpone and practice more.';
+  document.getElementById('mockFinalMsg').textContent = msg;
+  const chapNames = { 1: 'Values', 2: 'UK today', 3: 'History', 4: 'Modern society', 5: 'Government' };
+  const weakHtml = Object.entries(weakChapters).sort(function(a,b){return b[1] - a[1];}).map(function(pair) {
+    return '<div class="chapter-row"><div class="name">Chapter ' + pair[0] + ' — ' + chapNames[pair[0]] + '</div><div style="color: var(--red); font-weight: 700;">' + pair[1] + ' wrong</div></div>';
+  }).join('');
+  document.getElementById('mockWeakAreas').innerHTML = weakHtml || '<p style="color: var(--green); font-weight: 600;">No significant weak areas.</p>';
+}
+
+document.getElementById('mockRestart').addEventListener('click', function() {
+  document.getElementById('mock-result').style.display = 'none';
+  document.getElementById('mock-start').style.display = 'block';
+  renderMockHistory();
+});
+
+function renderMockHistory() {
+  if (!state) return;
+  const h = state.mocks.slice(-5).reverse();
+  if (h.length === 0) { document.getElementById('mockHistory').innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">No attempts yet.</p>'; return; }
+  document.getElementById('mockHistory').innerHTML = h.map(function(m) {
+    const d = new Date(m.ts);
+    const dateStr = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear().toString().slice(-2);
+    const pct = Math.round(m.score / 24 * 100);
+    const color = m.score >= 18 ? 'var(--green)' : m.score >= 15 ? 'var(--amber)' : 'var(--red)';
+    return '<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--border);"><span>' + dateStr + '</span><span><strong style="color: ' + color + ';">' + m.score + '/24</strong> <span style="color: var(--text-muted); margin-left: 6px;">(' + pct + '%)</span></span></div>';
+  }).join('');
+}
+
+const TRAP_WORDS_DATA = [
+  { word: 'NOT', type: 'Negation', meaning: 'Question asks for the OPPOSITE. The wrong answer is what you would normally pick.', example: 'Which is <strong>NOT</strong> a British value?' },
+  { word: 'EXCEPT', type: 'Negation', meaning: 'Find the ONE answer DIFFERENT from the others. Three options are correct, one is not.', example: 'All of the following are rights <strong>EXCEPT</strong>:' },
+  { word: 'FALSE', type: 'Negation', meaning: 'Find the statement that is WRONG.', example: 'Which statement is <strong>FALSE</strong>?' },
+  { word: 'NEVER', type: 'Negation', meaning: 'Absolute negative. One exception makes the statement false.', example: 'Women have <strong>NEVER</strong> been PM. (FALSE)' },
+  { word: 'NONE', type: 'Negation', meaning: 'Zero applies. If any is right, the "none" claim is false.', example: '<strong>NONE</strong> of these is a saint\'s day.' },
+  { word: 'SELECT TWO', type: 'Quantity', meaning: 'You MUST pick 2 options. Picking only 1 marks the whole question wrong.', example: '<strong>Select TWO</strong> responsibilities of UK residents.' },
+  { word: 'WHICH TWO', type: 'Quantity', meaning: 'Same as Select TWO — pick 2 answers.', example: '<strong>Which TWO</strong> countries make up Great Britain?' },
+  { word: 'BOTH', type: 'Quantity', meaning: 'Answer must apply to both things, not just one.', example: 'Under UK law, <strong>BOTH</strong> men and women can:' },
+  { word: 'ONE', type: 'Quantity', meaning: 'Pick exactly one answer. Simple straightforward.', example: 'Select <strong>ONE</strong> reason for the Act of Union.' },
+  { word: 'MOST', type: 'Qualifier', meaning: 'Means the majority, not all. Fits "most" cases.', example: '<strong>Most</strong> people in the UK live in:' },
+  { word: 'ONLY', type: 'Qualifier', meaning: 'Restricts the answer. No exceptions.', example: 'Jury service is <strong>ONLY</strong> for people aged:' },
+  { word: 'MAINLY', type: 'Qualifier', meaning: 'Means the main reason. Pick the biggest cause.', example: 'Henry VIII <strong>mainly</strong> broke from Rome because:' },
+  { word: 'ALWAYS', type: 'Qualifier', meaning: '100% of the time. Any exception = FALSE.', example: 'Remembrance Day is <strong>ALWAYS</strong> on:' },
+  { word: 'SOMETIMES', type: 'Qualifier', meaning: 'Occasionally. Soft claim. Usually TRUE.', example: 'Magistrates are <strong>sometimes</strong> unpaid. (TRUE)' },
+  { word: 'USUALLY', type: 'Qualifier', meaning: 'Most of the time. Soft claim, usually TRUE.', example: 'Elections <strong>usually</strong> happen every 5 years.' }
+];
+
+function renderTrapWords() {
+  const groups = ['Negation', 'Quantity', 'Qualifier'];
+  let html = '';
+  groups.forEach(function(g) {
+    html += '<h3 style="margin-top: 20px; margin-bottom: 8px; color: var(--teal);">' + g + ' traps</h3>';
+    TRAP_WORDS_DATA.filter(function(w){return w.type === g;}).forEach(function(w) {
+      html += '<div style="background: var(--red-light); border-left: 4px solid var(--red); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 10px;"><div style="font-size: 20px; font-weight: 900; color: var(--red); letter-spacing: 1px; margin-bottom: 4px;">' + w.word + '</div><div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">' + w.meaning + '</div><div style="font-size: 12px; color: var(--text-muted); padding: 6px 10px; background: white; border-radius: 4px;"><strong>Example:</strong> ' + w.example + '</div></div>';
+    });
+  });
+  document.getElementById('trapCards').innerHTML = html;
+}
+
+function renderTeacher() {
+  const names = Object.keys(allStudents);
+  if (names.length === 0) { document.getElementById('teacherTable').innerHTML = '<p style="font-size: 13px; color: var(--text-muted); padding: 10px;">No students yet.</p>'; return; }
+  const rows = names.map(function(n) {
+    const stu = allStudents[n];
+    const s = computeStats(stu);
+    return { name: n, tier: stu.tier || '—', s: s };
+  });
+  rows.sort(function(a, b){ return a.s.readiness - b.s.readiness; });
+  document.getElementById('teacherTable').innerHTML = rows.map(function(r) {
+    return '<div class="history-row"><div><strong>' + r.name + '</strong></div><div>' + (r.tier !== '—' ? 'Tier ' + r.tier : '—') + '</div><div>' + r.s.total + '</div><div>' + (r.s.bestMock !== null ? r.s.bestMock + '/24' : '—') + '</div><div><span class="readiness-label ' + r.s.status.cls + '">' + r.s.status.text + '</span></div></div>';
+  }).join('');
+}
+
+function renderStats() {
+  const names = Object.keys(allStudents);
+  const stats = names.map(function(n){return computeStats(allStudents[n]);});
+  document.getElementById('sActiveStudents').textContent = names.length;
+  document.getElementById('sTotalAnswers').textContent = stats.reduce(function(sum, s){return sum + s.total;}, 0);
+  document.getElementById('sTotalMocks').textContent = stats.reduce(function(sum, s){return sum + s.mocks.length;}, 0);
+  document.getElementById('sReadyStudents').textContent = stats.filter(function(s){return s.status.cls === 'status-ready';}).length;
+}
+
+document.getElementById('exportBtn').addEventListener('click', function() {
+  const data = JSON.stringify(allStudents, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'lca_students_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('resetAllBtn').addEventListener('click', function() {
+  if (confirm('Delete ALL student data? Cannot be undone.') && confirm('Really delete all students?')) {
+    localStorage.removeItem(ALL_STUDENTS_KEY);
+    allStudents = loadAllStudents();
+    renderTeacher();
+    renderStats();
+    alert('All data reset.');
+  }
+});
+
+function renderBank() {
+  const filter = document.getElementById('bankFilter').value;
+  let pool = QUESTIONS.slice();
+  if (filter === 'trap') pool = pool.filter(function(q){return q.trap;});
+  else if (filter !== 'all') pool = pool.filter(function(q){return q.chapter === parseInt(filter);});
+  document.getElementById('bankStats').textContent = 'Showing ' + pool.length + ' questions.';
+  const preview = pool.slice(0, 30);
+  document.getElementById('bankList').innerHTML = preview.map(function(q) {
+    return '<div style="padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px;"><div style="font-weight: 600; margin-bottom: 4px;">#' + q.id + ' · Ch' + q.chapter + (q.trap ? ' · <span class="trap-word">' + q.trap + '</span>' : '') + '</div><div style="color: var(--navy);">' + highlightTraps(q.q) + '</div></div>';
+  }).join('') + (pool.length > 30 ? '<div style="text-align: center; padding: 12px; color: var(--text-muted); font-size: 12px;">... and ' + (pool.length - 30) + ' more</div>' : '');
+}
+
+document.getElementById('bankFilter').addEventListener('change', renderBank);
+</script>
+</body>
+</html>
